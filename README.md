@@ -17,13 +17,15 @@ Verified with Pi 1.1.0 and Node 26.4.0.
 
 **Configuration change:** this package registers the provider as `pi-microsoft-decision-1`. If your existing `models.json` entry is named `azure-decision`, rename that key and use the settings below:
 
+NOTE: The baseUrl and deployment name needs to match your foundry endpoint and deployment name
+
 ```json
 {
   "providers": {
     "pi-microsoft-decision-1": {
       "baseUrl": "https://<resource-name>.services.ai.azure.com",
       "apiKey": "$AZURE_DECISION_API_KEY",
-      "deploymentName": "Decision-1"
+      "deploymentName": "<Your Foundry Deployment Name>"
     }
   }
 }
@@ -47,76 +49,12 @@ To make it available in new terminal sessions, add the export to your shell prof
 
 To call the classifier from scripts, enable Pi's `codemode` tool by adding `+codemode` to `defaultTools` in `settings.json`. If `defaultTools` already contains tools, append this entry rather than replacing them.
 
-```js
-const model = models.getModelOfType(
-  "classifier",
-  "pi-microsoft-decision-1",
-  "Microsoft-Decision-1"
-);
-
-const result = await models.classify(model, {
-  state: { message: "Checkout is down and customers cannot pay." },
-  questions: {
-    urgent: {
-      type: "bool",
-      instructions: "Does this need immediate attention?",
-      criteria: { true: "Immediate attention required", false: "Can wait" }
-    },
-    owner: {
-      type: "choice",
-      instructions: "Which team should own this incident?",
-      criteria: {
-        billing: "Payment platform",
-        engineering: "Core engineering",
-        support: "Customer support"
-      }
-    },
-    severity: {
-      type: "score",
-      instructions: "Rate the severity.",
-      criteria: ["cosmetic", "minor", "major", "critical"]
-    }
-  }
-});
-
-return result.stopReason === "stop"
-  ? { answers: result.answers, usage: result.usage }
-  : { error: result.errorMessage };
-```
-
 Pi's public classifier type is `bool`; the adapter maps it to Microsoft's wire type `noul` and maps the response back. Choice and score probabilities, confidence, fractional scores, and raw Decision answers are preserved.
 
 ## Use from a `pi-ai` coding agent
 
 The package root exports `createPiMicrosoftDecision1Provider`. Register the returned provider with `createModels()` and configure the resource endpoint and deployment explicitly:
 
-```js
-import { createModels } from "@earendil-works/pi-ai";
-import { createPiMicrosoftDecision1Provider } from "pi-microsoft-decision-1";
-
-const models = createModels();
-const provider = createPiMicrosoftDecision1Provider({
-  baseUrl: process.env.AZURE_DECISION_ENDPOINT,
-  deploymentName: process.env.AZURE_DECISION_DEPLOYMENT
-});
-models.setProvider(provider);
-
-const model = models.getModelOfType(
-  "classifier",
-  provider.id,
-  "Microsoft-Decision-1"
-);
-const result = await models.classify(model, {
-  state: { message: "Checkout is down and customers cannot pay." },
-  questions: {
-    urgent: {
-      type: "bool",
-      instructions: "Does this need immediate attention?",
-      criteria: { true: "Immediate attention required", false: "Can wait" }
-    }
-  }
-});
-```
 
 For this direct `pi-ai` integration, provide `AZURE_DECISION_ENDPOINT`, `AZURE_DECISION_DEPLOYMENT`, and `AZURE_DECISION_API_KEY` through the coding agent's environment (or provide the key through its `pi-ai` auth context). Set them before starting the agent:
 
@@ -155,10 +93,3 @@ The integration test requires a Pi installation. `PI_CODING_AGENT_PACKAGE` can p
 ## Security
 
 Extensions run with the permissions of the Pi process. Review the source before installing. This package sends classifier requests to the configured Microsoft Foundry resource and makes no telemetry or package-time network calls.
-
-## References
-
-- [Pi packages](https://pi.dev/docs/latest/packages)
-- [Pi extensions](https://pi.dev/docs/latest/extensions)
-- [Microsoft Decision quickstart](https://github.com/MicrosoftDocs/azure-ai-docs/blob/main/articles/foundry/foundry-models/how-to/use-foundry-models-microsoft-decision.md)
-- [Microsoft Foundry Decision-1 announcement](https://techcommunity.microsoft.com/blog/azure-ai-foundry-blog/introducing-microsoft-decision-1-in-microsoft-foundry-for-decision-and-classific/4562742)
