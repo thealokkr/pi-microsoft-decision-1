@@ -1,0 +1,44 @@
+{
+  "name": "pi-microsoft-decision-1",
+  "version": "0.1.0",
+  "description": "Microsoft Decision-1 classifier provider for Pi and pi-ai applications",
+  "author": "alokumar0_publicis",
+  "license": "MIT",
+  "type": "module",
+  "main": "./provider.mjs",
+  "types": "./provider.d.ts",
+  "exports": {
+    ".": {
+      "types": "./provider.d.ts",
+      "import": "./provider.mjs"
+    },
+    "./extension": "./index.ts"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "classifier",
+    "microsoft-decision",
+    "azure"
+  ],
+  "files": [
+    "index.ts",
+    "provider.mjs",
+    "provider.d.ts",
+    "decision-api.mjs",
+    "check-config.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "pi": {
+    "extensions": ["./index.ts"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "scripts": {
+    "check": "node --check index.ts && node --check provider.mjs && node --check decision-api.mjs && node --check check-config.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}
