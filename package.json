@@ -4,6 +4,10 @@
   "description": "Microsoft Decision-1 classifier provider for Pi and pi-ai applications",
   "author": "alokumar0_publicis",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thealokkr/pi-microsoft-decision-1.git"
+  },
   "type": "module",
   "main": "./provider.mjs",
   "types": "./provider.d.ts",
